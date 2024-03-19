@@ -1,17 +1,11 @@
 import { IVehiclesFormProps } from '../types/types';
-import { handleGenericInputChange } from './formUtil';
 
-export default function VehiclesForm({
-    vehicle,
-    onChange,
-    index,
-    removeVehicle,
-}: IVehiclesFormProps) {
-    const handleVehicleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        handleGenericInputChange(event, vehicle, (updatedVehicle) => {
-            onChange(index, updatedVehicle);
-        });
+const VehiclesForm = ({ vehicle, onChange, index, removeVehicle, errors }: IVehiclesFormProps) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        onChange(index, { ...vehicle, [name]: value });
     };
+
     return (
         <form>
             <div>
@@ -21,8 +15,9 @@ export default function VehiclesForm({
                     id="vin"
                     name="vin"
                     value={vehicle.vin}
-                    onChange={handleVehicleChange}
+                    onChange={handleChange}
                 />
+                {errors.vin && <p className="error">{errors.vin}</p>}
             </div>
             <div>
                 <label htmlFor="year">Year:</label>
@@ -31,8 +26,9 @@ export default function VehiclesForm({
                     id="year"
                     name="year"
                     value={vehicle.year || ''}
-                    onChange={handleVehicleChange}
+                    onChange={handleChange}
                 />
+                {errors.year && <p className="error">{errors.year}</p>}
             </div>
             <div>
                 <label htmlFor="make">Make:</label>
@@ -41,8 +37,9 @@ export default function VehiclesForm({
                     id="make"
                     name="make"
                     value={vehicle.make}
-                    onChange={handleVehicleChange}
+                    onChange={handleChange}
                 />
+                {errors.make && <p className="error">{errors.make}</p>}
             </div>
             <div>
                 <label htmlFor="model">Model:</label>
@@ -51,12 +48,15 @@ export default function VehiclesForm({
                     id="model"
                     name="model"
                     value={vehicle.model}
-                    onChange={handleVehicleChange}
+                    onChange={handleChange}
                 />
+                {errors.model && <p className="error">{errors.model}</p>}
             </div>
             <button type="button" onClick={() => removeVehicle(index)}>
                 Remove Vehicle
             </button>
         </form>
     );
-}
+};
+
+export default VehiclesForm;

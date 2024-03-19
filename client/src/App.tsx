@@ -1,30 +1,64 @@
 import React, { useEffect, useState } from 'react';
+
 import UserForm from './components/UserForm';
 import AddressForm from './components/AddressForm';
 import VehiclesForm from './components/VehiclesForm';
 import { IUserFormData, IAddressFormData, IVehicle } from './types/types';
 import Header from './components/Header';
-import ConfirmationView from './components/ConfirmationView';
 import QuoteView from './components/QuoteView';
+import { Errors, validateForm } from './common/util/formUtil';
 
 function App() {
-    const [step, setStep] = useState<number>(() => Number(localStorage.getItem('step')) || 1);
+    const initialErrorsState: { user: Errors; address: Errors; vehicle: Errors[] } = {
+        user: {} as Errors,
+        address: {} as Errors,
+        vehicle: [],
+    };
+
+    const defaultUserFormData: IUserFormData = {
+        firstName: '',
+        lastName: '',
+        dateOfBirth: '',
+    };
+
+    const defaultAddressFormData: IAddressFormData = {
+        street: '',
+        city: '',
+        state: '',
+        zipCode: '',
+    };
+
+    const defaultVehicleData: IVehicle = {
+        vin: '',
+        year: 0,
+        make: '',
+        model: '',
+    };
+
+    const [errors, setErrors] = useState(initialErrorsState);
+
     const [userData, setUserData] = useState<IUserFormData>(() =>
-        JSON.parse(localStorage.getItem('userData') || '{}')
-    );
-    const [addressData, setAddressData] = useState<IAddressFormData>(() =>
-        JSON.parse(localStorage.getItem('addressData') || '{}')
-    );
-    const [vehiclesData, setVehiclesData] = useState<IVehicle[]>(() =>
-        JSON.parse(localStorage.getItem('vehiclesData') || '[]')
+        JSON.parse(localStorage.getItem('userData') || JSON.stringify(defaultUserFormData))
     );
 
+    const [addressData, setAddressData] = useState<IAddressFormData>(() =>
+        JSON.parse(localStorage.getItem('addressData') || JSON.stringify(defaultAddressFormData))
+    );
+
+    const [vehiclesData, setVehiclesData] = useState<IVehicle[]>(() =>
+        JSON.parse(localStorage.getItem('vehiclesData') || JSON.stringify([defaultVehicleData]))
+    );
+
+    const [step, setStep] = useState<number>(() => Number(localStorage.getItem('step')) || 0);
+    const [showVehicleMessage, setShowVehicleMessage] = useState<string>('');
+
     useEffect(() => {
-        localStorage.setItem('step', step.toString());
-        localStorage.setItem('userData', JSON.stringify(userData));
-        localStorage.setItem('addressData', JSON.stringify(addressData));
-        localStorage.setItem('vehiclesData', JSON.stringify(vehiclesData));
-    }, [step, userData, addressData, vehiclesData]);
+        //add logic later to retrieve from db
+        localStorage.setItem('step', localStorage.getItem('step') || '0');
+        localStorage.setItem('userData', localStorage.getItem('userData') || '{}');
+        localStorage.setItem('addressData', localStorage.getItem('addressData') || '{}');
+        localStorage.setItem('vehiclesData', localStorage.getItem('vehiclesData') || '[]');
+    }, []);
 
     const addVehicle = () => {
         const newVehicle: IVehicle = { vin: '', year: null, make: '', model: '' };
@@ -40,49 +74,92 @@ function App() {
         const newVehiclesData = [...vehiclesData];
         newVehiclesData[vehicleIndex] = updatedVehicle;
         setVehiclesData(newVehiclesData);
+        localStorage.setItem('vehiclesData', JSON.stringify(newVehiclesData));
     };
 
-    const nextStep = () => setStep(step + 1);
-    const prevStep = () => setStep(step - 1);
+    const handleSubmit = () => {
+        const userValidation = validateForm(userData, 'user');
+        const addressValidation = validateForm(addressData, 'address');
+        const vehicleValidations = vehiclesData.map((vehicle) => validateForm(vehicle, 'vehicle'));
+
+        const allValid =
+            userValidation.isValid &&
+            addressValidation.isValid &&
+            vehicleValidations.every((v) => v.isValid);
+
+        const userErrors: Errors = userValidation.newErrors;
+        const addressErrors: Errors = addressValidation.newErrors;
+        const vehicleErrors: Errors[] = vehicleValidations.map((v) => v.newErrors);
+
+        //update Errors state
+        setErrors({
+            user: userErrors,
+            address: addressErrors,
+            vehicle: vehicleErrors,
+        });
+        if (vehiclesData.length === 0) {
+            setShowVehicleMessage('You must add at least one vehicle.');
+        } else if (vehiclesData.length > 3) {
+            setShowVehicleMessage('You can have a maximum of 3 vehicles.');
+        } else {
+            setShowVehicleMessage('');
+            if (allValid) {
+                setStep(step + 1);
+            }
+        }
+    };
 
     const renderStep = () => {
         switch (step) {
+            case 0:
+                return (
+                    <React.Fragment>
+                        <Header>
+                            <h3>Welcome to the Insurance Application</h3>
+                        </Header>
+                        <button onClick={() => setStep(1)}>Start New Application</button>
+                    </React.Fragment>
+                );
             case 1:
                 return (
                     <React.Fragment>
                         <Header>
-                            <h3>Enter your Information</h3>
+                            <h3>Member Information</h3>
                         </Header>
                         <UserForm
+                            errors={errors.user}
                             userData={userData}
-                            onChange={(updatedUserData) => setUserData(updatedUserData)}
+                            onChange={(updatedUserData) => {
+                                setUserData(updatedUserData);
+                                localStorage.setItem('userData', JSON.stringify(updatedUserData));
+                            }}
                         />
-                    </React.Fragment>
-                );
-            case 2:
-                return (
-                    <React.Fragment>
                         <Header>
-                            <h3>Enter your Address</h3>
+                            <h3>Address</h3>
                         </Header>
                         <AddressForm
+                            errors={errors.address}
                             addressData={addressData}
-                            onChange={(updatedAddressData) => setAddressData(updatedAddressData)}
+                            onChange={(updatedAddressData) => {
+                                setAddressData(updatedAddressData);
+                                localStorage.setItem(
+                                    'addressData',
+                                    JSON.stringify(updatedAddressData)
+                                );
+                            }}
                         />
-                    </React.Fragment>
-                );
-            case 3:
-                return (
-                    <React.Fragment>
                         <Header>
                             <h3>Add/Remove Vehicles</h3>
                         </Header>
+                        {showVehicleMessage && <p className="error">{showVehicleMessage}</p>}
                         {vehiclesData.map((vehicle: IVehicle, index: number) => (
                             <div key={index}>
                                 <Header>
                                     <h4>Vehicle {index + 1}</h4>
                                 </Header>
                                 <VehiclesForm
+                                    key={index}
+                                    errors={errors.vehicle[index] || {}}
                                     index={index}
                                     vehicle={vehicle}
                                     onChange={editVehicle}
@@ -91,29 +168,52 @@ function App() {
                             </div>
                         ))}
                         <button onClick={addVehicle}>Add Vehicle</button>
+                        <button onClick={handleSubmit}>Submit</button>
                     </React.Fragment>
                 );
-            case 4:
-                return (
-                    <React.Fragment>
-                        <Header>
-                            <h3>Confirm your Information</h3>
-                        </Header>
-                        <ConfirmationView
-                            userData={userData}
-                            addressData={addressData}
-                            vehiclesData={vehiclesData}
-                            onEdit={() => setStep(1)} // Go back to step 1 to edit
-                        />
-                    </React.Fragment>
-                );
-            case 5:
+            // case 2:
+            //     return (
+            //         <React.Fragment>
+            //             <Header>
+            //                 <h3>Confirm your Information</h3>
+            //             </Header>
+            //             <ConfirmationView
+            //                 userData={userData}
+            //                 addressData={addressData}
+            //                 vehiclesData={vehiclesData}
+            //                 onEdit={() => setStep(1)} // Go back to step 1 to edit
+            //             />
+            //         </React.Fragment>
+            //     );
+            case 2:
                 return (
                     <React.Fragment>
                         <Header>
                             <h3>Your Quote</h3>
                         </Header>
                         <QuoteView />
+                        <button
+                            onClick={() => {
+                                // Reset application data
+                                setStep(0);
+                                setUserData({
+                                    firstName: '',
+                                    lastName: '',
+                                    dateOfBirth: '',
+                                });
+                                setAddressData({
+                                    street: '',
+                                    city: '',
+                                    state: '',
+                                    zipCode: '',
+                                });
+                                setVehiclesData([]);
+                                // Also clear localStorage
+                                localStorage.clear(); // If you want to clear everything
+                            }}
+                        >
+                            Go to Home
+                        </button>
                     </React.Fragment>
                 );
             default:
@@ -121,14 +221,7 @@ function App() {
         }
     };
 
-    return (
-        <div>
-            {renderStep()}
-            {step > 1 && step < 5 && <button onClick={prevStep}>Back</button>}
-            {step < 4 && <button onClick={nextStep}>Next</button>}
-            {step === 4 && <button onClick={() => setStep(5)}>Submit</button>}
-        </div>
-    );
+    return <div>{renderStep()}</div>;
 }
 
 export default App;

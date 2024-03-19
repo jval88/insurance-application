@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { IConfirmationViewProps } from '../types/types';
 import UserView from './UserView';
 import AddressView from './AddressView';

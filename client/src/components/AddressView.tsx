@@ -5,10 +5,7 @@ const AddressView: React.FC<{ addressData: IAddressFormData }> = ({ addressData 
     return (
         <div>
             <div>
-                <strong>Street Address 1: </strong> {addressData.street1}
-            </div>
-            <div>
-                <strong>Street Address 2: </strong> {addressData.street2}
+                <strong>Street Address: </strong> {addressData.street}
             </div>
             <div>
                 <strong>City: </strong> {addressData.city}

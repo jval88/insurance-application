@@ -1,7 +1,11 @@
 import { IUserFormProps } from '../types/types';
-import { handleGenericInputChange } from './formUtil';
 
-export default function UserForm({ userData, onChange }: IUserFormProps) {
+const UserForm = ({ userData, onChange, errors }: IUserFormProps) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        onChange({ ...userData, [name]: value });
+    };
+
     return (
         <form>
             <div>
@@ -11,8 +15,9 @@ export default function UserForm({ userData, onChange }: IUserFormProps) {
                     id="firstName"
                     name="firstName"
                     value={userData.firstName}
-                    onChange={(e) => handleGenericInputChange(e, userData, onChange)}
+                    onChange={handleChange}
                 />
+                {errors.firstName && <p className="error">{errors.firstName}</p>}
             </div>
             <div>
                 <label htmlFor="lastName">Last Name:</label>
@@ -21,8 +26,9 @@ export default function UserForm({ userData, onChange }: IUserFormProps) {
                     id="lastName"
                     name="lastName"
                     value={userData.lastName}
-                    onChange={(e) => handleGenericInputChange(e, userData, onChange)}
+                    onChange={handleChange}
                 />
+                {errors.lastName && <p className="error">{errors.lastName}</p>}
             </div>
             <div>
                 <label htmlFor="dateOfBirth">Date of Birth:</label>
@@ -31,9 +37,12 @@ export default function UserForm({ userData, onChange }: IUserFormProps) {
                     id="dateOfBirth"
                     name="dateOfBirth"
                     value={userData.dateOfBirth}
-                    onChange={(e) => handleGenericInputChange(e, userData, onChange)}
+                    onChange={handleChange}
                 />
+                {errors.dateOfBirth && <p className="error">{errors.dateOfBirth}</p>}
             </div>
         </form>
     );
-}
+};
+
+export default UserForm;

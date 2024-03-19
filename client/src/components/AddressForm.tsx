@@ -1,28 +1,23 @@
 import { IAddressFormProps } from '../types/types';
-import { handleGenericInputChange } from './formUtil';
 
-export default function AddressForm({ addressData, onChange }: IAddressFormProps) {
+const AddressForm = ({ addressData, onChange, errors }: IAddressFormProps) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        onChange({ ...addressData, [name]: value });
+    };
+
     return (
         <form>
             <div>
-                <label htmlFor="street">Street Address 1:</label>
+                <label htmlFor="street">Street Address:</label>
                 <input
                     type="text"
-                    id="street1"
-                    name="street1"
-                    value={addressData.street1}
-                    onChange={(e) => handleGenericInputChange(e, addressData, onChange)}
+                    id="street"
+                    name="street"
+                    value={addressData.street}
+                    onChange={handleChange}
                 />
-            </div>
-            <div>
-                <label htmlFor="street">Street Address 2:</label>
-                <input
-                    type="text"
-                    id="street2"
-                    name="street2"
-                    value={addressData.street2}
-                    onChange={(e) => handleGenericInputChange(e, addressData, onChange)}
-                />
+                {errors.street && <p className="error">{errors.street}</p>}
             </div>
             <div>
                 <label htmlFor="city">City:</label>
@@ -31,8 +26,9 @@ export default function AddressForm({ addressData, onChange }: IAddressFormProps
                     id="city"
                     name="city"
                     value={addressData.city}
-                    onChange={(e) => handleGenericInputChange(e, addressData, onChange)}
+                    onChange={handleChange}
                 />
+                {errors.city && <p className="error">{errors.city}</p>}
             </div>
             <div>
                 <label htmlFor="state">State:</label>
@@ -41,8 +37,9 @@ export default function AddressForm({ addressData, onChange }: IAddressFormProps
                     id="state"
                     name="state"
                     value={addressData.state}
-                    onChange={(e) => handleGenericInputChange(e, addressData, onChange)}
+                    onChange={handleChange}
                 />
+                {errors.state && <p className="error">{errors.state}</p>}
             </div>
             <div>
                 <label htmlFor="zipCode">ZIP Code:</label>
@@ -51,9 +48,12 @@ export default function AddressForm({ addressData, onChange }: IAddressFormProps
                     id="zipCode"
                     name="zipCode"
                     value={addressData.zipCode}
-                    onChange={(e) => handleGenericInputChange(e, addressData, onChange)}
+                    onChange={handleChange}
                 />
+                {errors.zipCode && <p className="error">{errors.zipCode}</p>}
             </div>
         </form>
     );
-}
+};
+
+export default AddressForm;

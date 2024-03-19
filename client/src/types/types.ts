@@ -1,3 +1,5 @@
+import { Errors } from '../common/util/formUtil';
+
 export interface IUserFormData {
     firstName: string;
     lastName: string;
@@ -5,8 +7,7 @@ export interface IUserFormData {
 }
 
 export interface IAddressFormData {
-    street1: string;
-    street2: string;
+    street: string;
     city: string;
     state: string;
     zipCode: string;
@@ -22,17 +23,20 @@ export interface IVehicle {
 export interface IUserFormProps {
     userData: IUserFormData;
     onChange: (userData: IUserFormData) => void;
+    errors: Errors;
 }
 
 export interface IAddressFormProps {
     addressData: IAddressFormData;
     onChange: (addressData: IAddressFormData) => void;
+    errors: Errors;
 }
 
 export interface IVehiclesFormProps {
     vehicle: IVehicle;
     onChange: (index: number, updatedVehicle: IVehicle) => void;
     index: number;
+    errors: Errors;
     removeVehicle: (index: number) => void;
 }
 
