@@ -1,48 +1,48 @@
 import { Errors } from '../common/util/formUtil';
 
-export interface IUserFormData {
+export type UserFormData = {
     firstName: string;
     lastName: string;
     dateOfBirth: string;
-}
+};
 
-export interface IAddressFormData {
+export type AddressFormData = {
     street: string;
     city: string;
     state: string;
     zipCode: string;
-}
+};
 
-export interface IVehicle {
+export type Vehicle = {
     vin: string;
     year: number | null;
     make: string;
     model: string;
-}
+};
 
-export interface IUserFormProps {
-    userData: IUserFormData;
-    onChange: (userData: IUserFormData) => void;
+export type UserFormProps = {
+    userData: UserFormData;
+    onChange: (userData: UserFormData) => void;
     errors: Errors;
-}
+};
 
-export interface IAddressFormProps {
-    addressData: IAddressFormData;
-    onChange: (addressData: IAddressFormData) => void;
+export type AddressFormProps = {
+    addressData: AddressFormData;
+    onChange: (addressData: AddressFormData) => void;
     errors: Errors;
-}
+};
 
-export interface IVehiclesFormProps {
-    vehicle: IVehicle;
-    onChange: (index: number, updatedVehicle: IVehicle) => void;
+export type VehiclesFormProps = {
+    vehicle: Vehicle;
+    onChange: (index: number, updatedVehicle: Vehicle) => void;
     index: number;
     errors: Errors;
     removeVehicle: (index: number) => void;
-}
+};
 
-export interface IConfirmationViewProps {
-    userData: IUserFormData;
-    addressData: IAddressFormData;
-    vehiclesData: IVehicle[];
+export type ConfirmationViewProps = {
+    userData: UserFormData;
+    addressData: AddressFormData;
+    vehiclesData: Vehicle[];
     onEdit: () => void;
-}
+};

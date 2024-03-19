@@ -96,3 +96,49 @@ Implement the following if you have time or can plan to include within the time 
     -   First and Last name
     -   Date of Birth
     -   Relationship (Spouse, Sibling, Parent, Friend, Other)
+
+## PostgreSQL Setup
+
+This section provides the instructions for setting up a PostgreSQL database for your local
+development environment. Follow the steps below to configure the PostgreSQL database named
+`applicationDB`.
+
+### Running the Setup Script
+
+To prepare your PostgreSQL database, execute the setup script included in this repository. Start by
+making the script executable, then run it with administrative privileges:
+
+```bash
+chmod +x setupDatabase.sh
+sudo ./setupDatabase.sh
+```
+
+### What the Script Does
+
+The setupDatabase.sh script automates the following tasks to ensure a smooth setup for your
+PostgreSQL environment:
+
+Installs PostgreSQL: Updates the system's package lists and installs PostgreSQL along with its
+contrib package, which includes additional utilities and functionality.
+
+Starts and Enables PostgreSQL Service: Initiates the PostgreSQL service and sets it to automatically
+start on system boot.
+
+### Creates a New User and Database:
+
+Creates a new PostgreSQL user named myuser with the password password. This user has the necessary
+permissions to create and manage databases. Creates a new database called applicationDB. This
+database is set to be owned by myuser, ensuring that the user has full access to manage the
+database.
+
+### Configuration Summary
+
+After executing the script, the PostgreSQL database will be configured with the following settings:
+
+Database Name: applicationDB Username: myuser Password: password Port: 5432 Host: Localhost
+(127.0.0.1)
+
+### Prisma Config
+
+Edit/save the following line in your ./api/.env file:
+DATABASE_URL="postgresql://myuser:password@localhost:5432/applicationDB"

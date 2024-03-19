@@ -1,6 +1,8 @@
-import { IUserFormProps } from '../types/types';
+import React from 'react';
 
-const UserForm = ({ userData, onChange, errors }: IUserFormProps) => {
+import { UserFormProps } from '../types/types';
+
+const UserForm = ({ userData, onChange, errors }: UserFormProps) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         onChange({ ...userData, [name]: value });

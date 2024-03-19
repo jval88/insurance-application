@@ -1,11 +1,11 @@
 import React from 'react';
 
-import { IConfirmationViewProps } from '../types/types';
+import { ConfirmationViewProps } from '../types/types';
 import UserView from './UserView';
 import AddressView from './AddressView';
 import VehicleView from './VehicleView';
 
-const ConfirmationView: React.FC<IConfirmationViewProps> = ({
+const ConfirmationView: React.FC<ConfirmationViewProps> = ({
     userData,
     addressData,
     vehiclesData,

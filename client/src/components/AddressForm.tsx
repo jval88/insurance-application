@@ -1,6 +1,8 @@
-import { IAddressFormProps } from '../types/types';
+import React from 'react';
 
-const AddressForm = ({ addressData, onChange, errors }: IAddressFormProps) => {
+import { AddressFormProps } from '../types/types';
+
+const AddressForm = ({ addressData, onChange, errors }: AddressFormProps) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         onChange({ ...addressData, [name]: value });

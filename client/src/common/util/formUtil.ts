@@ -41,13 +41,13 @@ export const VALIDATION_SCHEMAS = {
     },
 };
 
-interface Schema {
+type Schema = {
     [key: string]: Validator[];
-}
+};
 
-export interface Errors {
+export type Errors = {
     [field: string]: string;
-}
+};
 
 export const validateForm = (
     data: { [key: string]: any },

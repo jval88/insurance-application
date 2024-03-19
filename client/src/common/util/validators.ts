@@ -1,9 +1,9 @@
 type ValidatorType = 'REQUIRE' | 'MINLENGTH' | 'MAXLENGTH' | 'MIN' | 'MAX' | 'NUMERIC' | 'MIN_AGE';
 
-export interface Validator {
+export type Validator = {
     type: ValidatorType;
     val?: number;
-}
+};
 
 export const VALIDATOR_TYPE_REQUIRE: ValidatorType = 'REQUIRE';
 export const VALIDATOR_TYPE_MINLENGTH: ValidatorType = 'MINLENGTH';

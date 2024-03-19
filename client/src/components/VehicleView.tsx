@@ -1,7 +1,8 @@
 import React from 'react';
-import { IVehicle } from '../types/types';
 
-const VehicleView: React.FC<{ vehicle: IVehicle }> = ({ vehicle }) => {
+import { Vehicle } from '../types/types';
+
+const VehicleView: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
     return (
         <div>
             <div>

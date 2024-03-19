@@ -1,6 +1,8 @@
-import { IVehiclesFormProps } from '../types/types';
+import React from 'react';
 
-const VehiclesForm = ({ vehicle, onChange, index, removeVehicle, errors }: IVehiclesFormProps) => {
+import { VehiclesFormProps } from '../types/types';
+
+const VehiclesForm = ({ vehicle, onChange, index, removeVehicle, errors }: VehiclesFormProps) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         onChange(index, { ...vehicle, [name]: value });
