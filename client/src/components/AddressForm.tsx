@@ -16,7 +16,7 @@ const AddressForm = ({ addressData, onChange, errors }: AddressFormProps) => {
                     type="text"
                     id="street"
                     name="street"
-                    value={addressData.street}
+                    value={addressData.street || ''}
                     onChange={handleChange}
                 />
                 {errors.street && <p className="error">{errors.street}</p>}
@@ -27,7 +27,7 @@ const AddressForm = ({ addressData, onChange, errors }: AddressFormProps) => {
                     type="text"
                     id="city"
                     name="city"
-                    value={addressData.city}
+                    value={addressData.city || ''}
                     onChange={handleChange}
                 />
                 {errors.city && <p className="error">{errors.city}</p>}
@@ -38,7 +38,7 @@ const AddressForm = ({ addressData, onChange, errors }: AddressFormProps) => {
                     type="text"
                     id="state"
                     name="state"
-                    value={addressData.state}
+                    value={addressData.state || ''}
                     onChange={handleChange}
                 />
                 {errors.state && <p className="error">{errors.state}</p>}

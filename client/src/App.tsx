@@ -13,14 +13,12 @@ function App() {
                 <Route path="/" element={<StartApplicationButton />} />
                 <Route
                     path="/applications/:id"
-                    element={
-                        <div>
-                            <Application setQuoteValue={setQuoteValue} />
-                        </div>
-                    }
+                    element={<Application setQuoteValue={setQuoteValue} />}
                 />
                 <Route path="/quote" element={<QuoteView value={quoteValue} />} />
-                {/* <Route path="*" element={<Navigate replace to="/" />} /> */}
+                {/* <Route path="*" element={<Navigate replace to="/" />} />
+                 *****Comment out for now from DEV as it was sometimes rerouting to fallback before it could resolve to above paths*****
+                 */}
             </Routes>
         </Router>
     );

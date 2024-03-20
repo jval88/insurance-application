@@ -3,17 +3,9 @@ import { Request, Response, NextFunction } from 'express';
 
 import db from '../db';
 const HttpError = require('../models/http-error');
-import { Vehicle, Member, Address } from '@prisma/client'; // Import types from Prisma client
+import { ApplicationData } from '../common/types/types';
 
-async function updateApplicationData(
-    appId: string,
-    data: {
-        member?: Member;
-        address?: Address;
-        vehicles?: Vehicle[];
-        additionalMembers?: Member[];
-    }
-): Promise<any> {
+async function updateApplicationData(appId: string, data: ApplicationData): Promise<any> {
     return await db.$transaction(async (transaction) => {
         let updatedMemberId = null;
         const { member, address, vehicles, additionalMembers } = data;
@@ -129,10 +121,10 @@ export async function createApplication(req: Request, res: Response, next: NextF
             include: { member: true, address: true, vehicles: true, additionalMembers: true },
         });
 
-        const resumeRoute = `http://localhost:5173/applications/${app.id}`;
+        const resumeRoute = `${process.env.RESUME_ROUTE}${app.id}`;
 
         // res.redirect(resumeRoute);
-        res.json({
+        res.status(201).json({
             message: `Start a new insurance application with id ${app.id}`,
             application: app,
             resumeRoute: resumeRoute, // Resume route for frontend
@@ -148,11 +140,19 @@ export async function getApplication(req: Request, res: Response, next: NextFunc
     const id = req.params.id;
 
     try {
-        const app = await db.application.findUnique({ where: { id } });
+        const app = await db.application.findUnique({
+            where: { id },
+            include: {
+                member: true,
+                address: true,
+                vehicles: true,
+                additionalMembers: true,
+            },
+        });
         if (!app) {
             return next(new HttpError('Could not find an application for the provided id.', 404));
         }
-        res.json(app);
+        res.status(200).json(app);
     } catch (error) {
         next(error);
     }
@@ -160,16 +160,12 @@ export async function getApplication(req: Request, res: Response, next: NextFunc
 
 export async function updateApplication(req: Request, res: Response, next: NextFunction) {
     const errors = validationResult(req);
-    console.log(req.body);
     if (!errors.isEmpty()) {
         // Convert the array of error objects into a more readable format
         const errorMessages = errors.array().map((error: typeof ValidationError) => ({
             field: error.param,
             message: error.msg,
         }));
-
-        // Log the error details for debugging
-        console.log(JSON.stringify({ errors: errorMessages }, null, 2));
 
         // Send the detailed error response
         return next(
@@ -189,8 +185,7 @@ export async function updateApplication(req: Request, res: Response, next: NextF
 
     try {
         const updatedApp = await updateApplicationData(req.params.id, data);
-        console.log(updatedApp);
-        res.json(updatedApp);
+        res.status(200).json(updatedApp);
     } catch (error) {
         console.error('Error in updateApplication:', error);
 
@@ -204,7 +199,6 @@ export async function validateAndUpdateApplication(
     res: Response,
     next: NextFunction
 ) {
-    console.log(req.body);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         // Convert the array of error objects into a more readable format
@@ -212,9 +206,6 @@ export async function validateAndUpdateApplication(
             field: error.param,
             message: error.msg,
         }));
-
-        // Log the error details for debugging
-        console.log(JSON.stringify({ errors: errorMessages }, null, 2));
 
         // Send the detailed error response
         return next(
@@ -238,7 +229,7 @@ export async function validateAndUpdateApplication(
 
         const validationNumber = Math.random() * 1000;
 
-        res.json({
+        res.status(200).json({
             message: `Updated insurance application with id ${appId}`,
             application: updatedApp,
             validationNumber: validationNumber,
@@ -248,21 +239,5 @@ export async function validateAndUpdateApplication(
 
         const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
         next(new HttpError(`Updating the application failed: ${errorMessage}`, 500));
-    }
-}
-
-export async function deleteApplication(req: Request, res: Response, next: NextFunction) {
-    const appId = req.params.id;
-
-    try {
-        const existingApp = await db.application.findUnique({ where: { id: appId } });
-        if (!existingApp) {
-            return next(new HttpError('Application not found', 404));
-        }
-        await db.application.delete({ where: { id: appId } });
-
-        res.json({ message: `Deleted application with id ${appId}` });
-    } catch (error) {
-        next(error instanceof Error ? error : new Error('Unknown Error occurred'));
     }
 }

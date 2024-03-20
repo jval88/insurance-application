@@ -16,7 +16,7 @@ const UserForm = ({ userData, onChange, errors }: UserFormProps) => {
                     type="text"
                     id="firstName"
                     name="firstName"
-                    value={userData.firstName}
+                    value={userData.firstName || ''}
                     onChange={handleChange}
                 />
                 {errors.firstName && <p className="error">{errors.firstName}</p>}
@@ -27,7 +27,7 @@ const UserForm = ({ userData, onChange, errors }: UserFormProps) => {
                     type="text"
                     id="lastName"
                     name="lastName"
-                    value={userData.lastName}
+                    value={userData.lastName || ''}
                     onChange={handleChange}
                 />
                 {errors.lastName && <p className="error">{errors.lastName}</p>}
@@ -38,7 +38,7 @@ const UserForm = ({ userData, onChange, errors }: UserFormProps) => {
                     type="date"
                     id="dateOfBirth"
                     name="dateOfBirth"
-                    value={userData.dateOfBirth}
+                    value={userData.dateOfBirth || ''}
                     onChange={handleChange}
                 />
                 {errors.dateOfBirth && <p className="error">{errors.dateOfBirth}</p>}
