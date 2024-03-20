@@ -1,7 +1,8 @@
 import React from 'react';
-import { IAddressFormData } from '../types/types';
 
-const AddressView: React.FC<{ addressData: IAddressFormData }> = ({ addressData }) => {
+import { AddressFormData } from '../types/types';
+
+const AddressView: React.FC<{ addressData: AddressFormData }> = ({ addressData }) => {
     return (
         <div>
             <div>

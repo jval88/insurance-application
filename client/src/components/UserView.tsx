@@ -1,7 +1,8 @@
 import React from 'react';
-import { IUserFormData } from '../types/types';
 
-const UserView: React.FC<{ userData: IUserFormData }> = ({ userData }) => {
+import { UserFormData } from '../types/types';
+
+const UserView: React.FC<{ userData: UserFormData }> = ({ userData }) => {
     return (
         <div>
             <div>

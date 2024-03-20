@@ -1,15 +1,64 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Application {
-   id        Int      @id @default(autoincrement())
+  id                String    @id @default(uuid())
+  memberId          String?   @unique
+  member            Member?   @relation("PrimaryMember", fields: [memberId], references: [id])
+  address           Address?
+  vehicles          Vehicle[]
+  additionalMembers Member[]  @relation("AdditionalMembers")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+model Member {
+  id                      String            @id @default(uuid())
+  firstName               String?
+  lastName                String?
+  dateOfBirth             DateTime?
+  relationship            RelationshipType?
+  primaryApplication      Application?      @relation("PrimaryMember")
+  additionalApplicationId String?
+  additionalApplication   Application?      @relation("AdditionalMembers", fields: [additionalApplicationId], references: [id])
+  createdAt               DateTime          @default(now())
+  updatedAt               DateTime          @updatedAt
+}
+
+model Address {
+  id            String      @id @default(uuid())
+  street        String?
+  city          String?
+  state         String?
+  zipCode       Int?
+  applicationId String      @unique
+  application   Application @relation(fields: [applicationId], references: [id])
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Vehicle {
+  id            String      @id @default(uuid())
+  vin           String?
+  year          Int?
+  make          String?
+  model         String?
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id])
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+enum RelationshipType {
+  Spouse
+  Sibling
+  Parent
+  Friend
+  Other
 }

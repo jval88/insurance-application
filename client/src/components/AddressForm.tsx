@@ -1,6 +1,8 @@
-import { IAddressFormProps } from '../types/types';
+import React from 'react';
 
-const AddressForm = ({ addressData, onChange, errors }: IAddressFormProps) => {
+import { AddressFormProps } from '../types/types';
+
+const AddressForm = ({ addressData, onChange, errors }: AddressFormProps) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         onChange({ ...addressData, [name]: value });
@@ -44,10 +46,10 @@ const AddressForm = ({ addressData, onChange, errors }: IAddressFormProps) => {
             <div>
                 <label htmlFor="zipCode">ZIP Code:</label>
                 <input
-                    type="text"
+                    type="number"
                     id="zipCode"
                     name="zipCode"
-                    value={addressData.zipCode}
+                    value={addressData.zipCode || ''}
                     onChange={handleChange}
                 />
                 {errors.zipCode && <p className="error">{errors.zipCode}</p>}

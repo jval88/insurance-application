@@ -1,9 +1,9 @@
 type ValidatorType = 'REQUIRE' | 'MINLENGTH' | 'MAXLENGTH' | 'MIN' | 'MAX' | 'NUMERIC' | 'MIN_AGE';
 
-export interface Validator {
+export type Validator = {
     type: ValidatorType;
     val?: number;
-}
+};
 
 export const VALIDATOR_TYPE_REQUIRE: ValidatorType = 'REQUIRE';
 export const VALIDATOR_TYPE_MINLENGTH: ValidatorType = 'MINLENGTH';
@@ -60,7 +60,7 @@ export const validate = (value: string | number, validators: Validator[]): strin
         ) {
             return `Maximum length is ${validator.val}`;
         }
-        if (validator.type === VALIDATOR_TYPE_MIN && +value < validator.val!) {
+        if (validator.type === VALIDATOR_TYPE_MIN && value && +value < validator.val!) {
             return `Minimum value is ${validator.val}`;
         }
         if (validator.type === VALIDATOR_TYPE_MAX && +value > validator.val!) {
