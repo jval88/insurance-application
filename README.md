@@ -149,14 +149,18 @@ DATABASE_URL="postgresql://myuser:password@localhost:5432/applicationDB"
 
 ### ENV Config
 
-Edit/save the following variables in your ./api/.env file: API_PORT RESUME_ROUTE
+Edit/save the following variables in your ./api/.env file: API_PORT  
+RESUME_ROUTE
 
-For example: API_PORT=5000 RESUME_ROUTE=http://localhost:5173/applications/
+For example:  
+API_PORT=5000  
+RESUME_ROUTE=http://localhost:5173/applications/
 
 Edit/save the following variable in your ./client/.env file (create if you don't have one):
 VITE_API_URL
 
-For example: VITE_API_URL=http://localhost:5000
+For example:  
+VITE_API_URL=http://localhost:5000
 
 ### Starting the App
 
