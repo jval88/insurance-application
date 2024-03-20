@@ -149,7 +149,8 @@ DATABASE_URL="postgresql://myuser:password@localhost:5432/applicationDB"
 
 ### ENV Config
 
-Edit/save the following variables in your ./api/.env file: API_PORT  
+Edit/save the following variables in your ./api/.env file:  
+API_PORT  
 RESUME_ROUTE
 
 For example:  
