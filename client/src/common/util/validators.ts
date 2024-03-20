@@ -60,7 +60,7 @@ export const validate = (value: string | number, validators: Validator[]): strin
         ) {
             return `Maximum length is ${validator.val}`;
         }
-        if (validator.type === VALIDATOR_TYPE_MIN && +value < validator.val!) {
+        if (validator.type === VALIDATOR_TYPE_MIN && value && +value < validator.val!) {
             return `Minimum value is ${validator.val}`;
         }
         if (validator.type === VALIDATOR_TYPE_MAX && +value > validator.val!) {

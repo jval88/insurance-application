@@ -9,25 +9,26 @@ datasource db {
 
 model Application {
   id                String    @id @default(uuid())
-  memberId          String    @unique
+  memberId          String?   @unique
   member            Member?   @relation("PrimaryMember", fields: [memberId], references: [id])
   address           Address?
   vehicles          Vehicle[]
   additionalMembers Member[]  @relation("AdditionalMembers")
   createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 }
 
 model Member {
-  id                      String       @id @default(uuid())
+  id                      String            @id @default(uuid())
   firstName               String?
   lastName                String?
-  birthDate               DateTime?
-  relationship            String?
-  primaryApplication      Application? @relation("PrimaryMember")
+  dateOfBirth             DateTime?
+  relationship            RelationshipType?
+  primaryApplication      Application?      @relation("PrimaryMember")
   additionalApplicationId String?
-  additionalApplication   Application? @relation("AdditionalMembers", fields: [additionalApplicationId], references: [id])
-  createdAt               DateTime     @default(now())
-  updatedAt               DateTime     @updatedAt
+  additionalApplication   Application?      @relation("AdditionalMembers", fields: [additionalApplicationId], references: [id])
+  createdAt               DateTime          @default(now())
+  updatedAt               DateTime          @updatedAt
 }
 
 model Address {
@@ -52,4 +53,12 @@ model Vehicle {
   application   Application @relation(fields: [applicationId], references: [id])
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
+}
+
+enum RelationshipType {
+  Spouse
+  Sibling
+  Parent
+  Friend
+  Other
 }

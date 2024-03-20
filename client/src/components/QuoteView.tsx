@@ -1,13 +1,11 @@
 import React from 'react';
+import { QuoteViewProps } from '../types/types';
 
-export default function QuoteView() {
-    // Placeholder for where you would calculate the insurance quote
-    const quote = Math.random() * 1000; // Replace this with actual quote calculation
-
+export default function QuoteView({ value }: QuoteViewProps) {
     return (
         <div>
             <h4>Your Insurance Quote</h4>
-            <p>${quote.toFixed(2)}</p>
+            <p>${value.toFixed(2)}</p>
         </div>
     );
 }

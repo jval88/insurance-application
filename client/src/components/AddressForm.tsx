@@ -46,10 +46,10 @@ const AddressForm = ({ addressData, onChange, errors }: AddressFormProps) => {
             <div>
                 <label htmlFor="zipCode">ZIP Code:</label>
                 <input
-                    type="text"
+                    type="number"
                     id="zipCode"
                     name="zipCode"
-                    value={addressData.zipCode}
+                    value={addressData.zipCode || ''}
                     onChange={handleChange}
                 />
                 {errors.zipCode && <p className="error">{errors.zipCode}</p>}

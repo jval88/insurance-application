@@ -1,9 +1,14 @@
 import express, { Request, Response } from 'express';
 import routes from './routes';
+import cors from 'cors';
 
-const PORT = process.env.API_PORT || 8000;
+const PORT = 5000;
 
 const app = express();
+
+app.use(cors());
+
+app.use(express.json());
 
 app.get('/ping', (req: Request, res: Response) => {
     res.json({ message: 'pong' });

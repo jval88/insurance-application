@@ -10,7 +10,7 @@ export type AddressFormData = {
     street: string;
     city: string;
     state: string;
-    zipCode: string;
+    zipCode: number | null;
 };
 
 export type Vehicle = {
@@ -18,6 +18,13 @@ export type Vehicle = {
     year: number | null;
     make: string;
     model: string;
+};
+
+export type AdditionalMember = {
+    firstName: string;
+    lastName: string;
+    dateOfBirth: string;
+    relationship: 'Spouse' | 'Sibling' | 'Parent' | 'Friend' | 'Other' | '';
 };
 
 export type UserFormProps = {
@@ -40,9 +47,25 @@ export type VehiclesFormProps = {
     removeVehicle: (index: number) => void;
 };
 
+export type AdditionalMemberFormProps = {
+    member: AdditionalMember;
+    onChange: (index: number, updatedMember: AdditionalMember) => void;
+    removeMember: (index: number) => void;
+    index: number;
+    errors: Errors;
+};
+
 export type ConfirmationViewProps = {
     userData: UserFormData;
     addressData: AddressFormData;
     vehiclesData: Vehicle[];
     onEdit: () => void;
+};
+
+export type ApplicationProps = {
+    setQuoteValue: (number: number) => void;
+};
+
+export type QuoteViewProps = {
+    value: number;
 };

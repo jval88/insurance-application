@@ -23,16 +23,16 @@ routes.get('/:id', Controllers.getApplication);
 routes.put(
     '/:id',
     [
-        check('member.firstName')
-            .optional()
+        check('userData.firstName')
+            .optional({ checkFalsy: true })
             .notEmpty()
             .withMessage('First name of the primary member cannot be empty'),
-        check('member.lastName')
-            .optional()
+        check('userData.lastName')
+            .optional({ checkFalsy: true })
             .notEmpty()
             .withMessage('Last name of the primary member cannot be empty'),
-        check('member.dateOfBirth')
-            .optional()
+        check('userData.dateOfBirth')
+            .optional({ checkFalsy: true })
             .custom((value: string) => {
                 if (!value) return true;
                 const age = calculateAge(value);
@@ -41,33 +41,54 @@ routes.put(
                 }
                 return true;
             }),
-        check('address.street').optional().notEmpty().withMessage('Street cannot be empty'),
-        check('address.city').optional().notEmpty().withMessage('City cannot be empty'),
-        check('address.state').optional().notEmpty().withMessage('State cannot be empty'),
-        check('address.zipCode').optional().isNumeric().withMessage('Zip code must be numeric'),
-        check('vehicles').optional().isArray().withMessage('Vehicles must be an array'),
-        check('vehicles.*.vin').optional().notEmpty().withMessage('Each vehicle must have a VIN'),
-        check('vehicles.*.year')
-            .optional()
+        check('addressData.street')
+            .optional({ checkFalsy: true })
+            .notEmpty()
+            .withMessage('Street cannot be empty'),
+        check('addressData.city')
+            .optional({ checkFalsy: true })
+            .notEmpty()
+            .withMessage('City cannot be empty'),
+        check('addressData.state')
+            .optional({ checkFalsy: true })
+            .notEmpty()
+            .withMessage('State cannot be empty'),
+        check('addressData.zipCode')
+            .optional({ checkFalsy: true })
+            .isNumeric()
+            .withMessage('Zip code must be numeric'),
+        check('vehiclesData')
+            .optional({ checkFalsy: true })
+            .isArray()
+            .withMessage('Vehicles must be an array'),
+        check('vehiclesData.*.vin')
+            .optional({ checkFalsy: true })
+            .notEmpty()
+            .withMessage('Each vehicle must have a VIN'),
+        check('vehiclesData.*.year')
+            .optional({ checkFalsy: true })
             .isNumeric()
             .withMessage('Vehicle year must be numeric')
             .isInt({ min: 1985, max: new Date().getFullYear() + 1 })
             .withMessage(`Vehicle year must be between 1985 and ${new Date().getFullYear() + 1}`),
-        check('vehicles.*.make').optional().notEmpty().withMessage('Each vehicle must have a make'),
-        check('vehicles.*.model')
-            .optional()
+        check('vehiclesData.*.make')
+            .optional({ checkFalsy: true })
+            .notEmpty()
+            .withMessage('Each vehicle must have a make'),
+        check('vehiclesData.*.model')
+            .optional({ checkFalsy: true })
             .notEmpty()
             .withMessage('Each vehicle must have a model'),
-        check('additionalMembers.*.firstName')
-            .optional()
+        check('additionalMembersData.*.firstName')
+            .optional({ checkFalsy: true })
             .notEmpty()
             .withMessage('Each additional member’s first name cannot be empty'),
-        check('additionalMembers.*.lastName')
-            .optional()
+        check('additionalMembersData.*.lastName')
+            .optional({ checkFalsy: true })
             .notEmpty()
             .withMessage('Each additional member’s last name cannot be empty'),
-        check('additionalMembers.*.dateOfBirth')
-            .optional()
+        check('additionalMembersData.*.dateOfBirth')
+            .optional({ checkFalsy: true })
             .custom((value: string) => {
                 if (!value) return true;
                 const age = calculateAge(value);
@@ -76,8 +97,8 @@ routes.put(
                 }
                 return true;
             }),
-        check('additionalMembers.*.relationship')
-            .optional()
+        check('additionalMembersData.*.relationship')
+            .optional({ checkFalsy: true })
             .notEmpty()
             .withMessage('Each additional member’s relationship cannot be empty'),
     ],
@@ -87,13 +108,14 @@ routes.put(
 routes.post(
     '/:id/submit',
     [
-        check('member.firstName')
+        // Check primary member details
+        check('userData.firstName')
             .notEmpty()
             .withMessage('First name of the primary member is required'),
-        check('member.lastName')
+        check('userData.lastName')
             .notEmpty()
             .withMessage('Last name of the primary member is required'),
-        check('member.dateOfBirth')
+        check('userData.dateOfBirth')
             .notEmpty()
             .withMessage('Date of birth of the primary member is required')
             .custom((value: string) => {
@@ -103,36 +125,36 @@ routes.post(
                 }
                 return true;
             }),
-        check('address.street').notEmpty().withMessage('Street is required'),
-        check('address.city').notEmpty().withMessage('City is required'),
-        check('address.state').notEmpty().withMessage('State is required'),
-        check('address.zipCode')
+
+        // Check address details
+        check('addressData.street').notEmpty().withMessage('Street is required'),
+        check('addressData.city').notEmpty().withMessage('City is required'),
+        check('addressData.state').notEmpty().withMessage('State is required'),
+        check('addressData.zipCode')
             .notEmpty()
             .withMessage('Zip code is required')
-            .isNumeric()
+            .isInt()
             .withMessage('Zip code must be numeric'),
-        check('vehicles')
-            .isArray({ min: 1, max: 3 })
-            .withMessage('Must have 1 to 3 vehicles')
-            .notEmpty()
-            .withMessage('Vehicle information is required'),
-        check('vehicles.*.vin').notEmpty().withMessage('Each vehicle must have a VIN'),
-        check('vehicles.*.year')
+
+        // Check vehicle details
+        check('vehiclesData').isArray({ min: 1, max: 3 }).withMessage('Must have 1 to 3 vehicles'),
+        check('vehiclesData.*.vin').notEmpty().withMessage('Each vehicle must have a VIN'),
+        check('vehiclesData.*.year')
             .notEmpty()
             .withMessage('Each vehicle must have a year')
-            .isNumeric()
-            .withMessage('Vehicle year must be numeric')
             .isInt({ min: 1985, max: new Date().getFullYear() + 1 })
             .withMessage(`Vehicle year must be between 1985 and ${new Date().getFullYear() + 1}`),
-        check('vehicles.*.make').notEmpty().withMessage('Each vehicle must have a make'),
-        check('vehicles.*.model').notEmpty().withMessage('Each vehicle must have a model'),
-        check('additionalMembers.*.firstName')
+        check('vehiclesData.*.make').notEmpty().withMessage('Each vehicle must have a make'),
+        check('vehiclesData.*.model').notEmpty().withMessage('Each vehicle must have a model'),
+
+        // Check additional members' details
+        check('additionalMembersData.*.firstName')
             .notEmpty()
             .withMessage('Each additional member must have a first name'),
-        check('additionalMembers.*.lastName')
+        check('additionalMembersData.*.lastName')
             .notEmpty()
             .withMessage('Each additional member must have a last name'),
-        check('additionalMembers.*.dateOfBirth')
+        check('additionalMembersData.*.dateOfBirth')
             .notEmpty()
             .withMessage('Each additional member must have a date of birth')
             .custom((value: string) => {
@@ -142,7 +164,7 @@ routes.post(
                 }
                 return true;
             }),
-        check('additionalMembers.*.relationship')
+        check('additionalMembersData.*.relationship')
             .notEmpty()
             .withMessage('Each additional member must have a relationship specified'),
     ],
