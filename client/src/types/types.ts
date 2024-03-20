@@ -62,6 +62,14 @@ export type ConfirmationViewProps = {
     onEdit: () => void;
 };
 
+export type UpdateApplicationProps = {
+    id: string | undefined;
+    userData: UserFormData;
+    addressData: AddressFormData;
+    vehiclesData: Vehicle[];
+    additionalMembersData: AdditionalMember[];
+};
+
 export type ApplicationProps = {
     setQuoteValue: (number: number) => void;
 };

@@ -28,7 +28,7 @@ const AdditionalMemberForm: React.FC<AdditionalMemberFormProps> = ({
                         type="text"
                         id={`firstName-${index}`}
                         name="firstName"
-                        value={member.firstName}
+                        value={member.firstName || ''}
                         onChange={handleChange}
                     />
                     {errors.firstName && <p className="error">{errors.firstName}</p>}
@@ -39,7 +39,7 @@ const AdditionalMemberForm: React.FC<AdditionalMemberFormProps> = ({
                         type="text"
                         id={`lastName-${index}`}
                         name="lastName"
-                        value={member.lastName}
+                        value={member.lastName || ''}
                         onChange={handleChange}
                     />
                     {errors.lastName && <p className="error">{errors.lastName}</p>}
@@ -50,7 +50,7 @@ const AdditionalMemberForm: React.FC<AdditionalMemberFormProps> = ({
                         type="date"
                         id={`dateOfBirth-${index}`}
                         name="dateOfBirth"
-                        value={member.dateOfBirth}
+                        value={member.dateOfBirth || ''}
                         onChange={handleChange}
                     />
                     {errors.dateOfBirth && <p className="error">{errors.dateOfBirth}</p>}
@@ -60,7 +60,7 @@ const AdditionalMemberForm: React.FC<AdditionalMemberFormProps> = ({
                     <select
                         id={`relationship-${index}`}
                         name="relationship"
-                        value={member.relationship}
+                        value={member.relationship || ''}
                         onChange={handleSelectChange}
                     >
                         <option value="">Select relationship:</option>

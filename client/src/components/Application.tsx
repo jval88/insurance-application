@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 
+import './Application.css';
 import { UserFormData, AddressFormData, Vehicle, AdditionalMember } from '../types/types';
 import UserForm from './UserForm';
 import AddressForm from './AddressForm';
@@ -9,50 +9,28 @@ import VehiclesForm from './VehiclesForm';
 import { ApplicationProps } from '../types/types';
 import AdditionalMemberForm from './AdditionalMemberForm';
 import Header from './Header';
-import { Errors, clearLocalStorage, validateForm, validateSaveForm } from '../common/util/formUtil';
+import {
+    clearLocalStorage,
+    formatDateToYYYYMMDD,
+    validateForm,
+    validateSaveForm,
+} from '../common/util/formUtil';
+import {
+    defaultAdditionalMemberFormData,
+    defaultAddressFormData,
+    defaultUserFormData,
+    defaultVehicleData,
+    initialErrorsState,
+} from '../common/defaults/applicationDefaults';
+import {
+    getApplication,
+    putApplication,
+    validateAndSubmitApplication,
+} from '../common/services/applicationServices';
 
 const Application: React.FC<ApplicationProps> = ({ setQuoteValue }) => {
     const { id } = useParams();
     const navigate = useNavigate();
-
-    const defaultUserFormData: UserFormData = {
-        firstName: '',
-        lastName: '',
-        dateOfBirth: '',
-    };
-
-    const defaultAdditionalMemberFormData: AdditionalMember = {
-        firstName: '',
-        lastName: '',
-        dateOfBirth: '',
-        relationship: '',
-    };
-
-    const defaultAddressFormData: AddressFormData = {
-        street: '',
-        city: '',
-        state: '',
-        zipCode: null,
-    };
-
-    const defaultVehicleData: Vehicle = {
-        vin: '',
-        year: null,
-        make: '',
-        model: '',
-    };
-
-    const initialErrorsState: {
-        user: Errors;
-        additionalMember: Errors[];
-        address: Errors;
-        vehicle: Errors[];
-    } = {
-        user: {} as Errors,
-        additionalMember: [],
-        address: {} as Errors,
-        vehicle: [],
-    };
 
     const [errors, setErrors] = useState(initialErrorsState);
     const [userData, setUserData] = useState<UserFormData>(defaultUserFormData);
@@ -69,15 +47,24 @@ const Application: React.FC<ApplicationProps> = ({ setQuoteValue }) => {
         const fetchData = async (appId: string | undefined) => {
             if (appId) {
                 try {
-                    const response = await axios.get(`http://localhost:5000/applications/${appId}`);
+                    const response = await getApplication(appId);
                     const { member, address, vehicles, additionalMembers } = response.data;
 
                     // Determine if any of the backend data is populated
                     const isAnyDataPopulated =
-                        member || address || vehicles?.length > 0 || additionalMembers?.length > 0;
+                        member.dateOfBirth ||
+                        member.firstName ||
+                        member.lastName ||
+                        address.street ||
+                        address.city ||
+                        address.state ||
+                        address.zipCode ||
+                        vehicles?.length > 0 ||
+                        additionalMembers?.length > 0;
 
                     if (isAnyDataPopulated) {
-                        // If any backend data is populated, use all backend data
+                        if (member.dateOfBirth)
+                            member.dateOfBirth = formatDateToYYYYMMDD(member.dateOfBirth);
                         const newUserData = member || defaultUserFormData;
                         localStorage.setItem('userData', JSON.stringify(newUserData));
                         setUserData(newUserData);
@@ -90,6 +77,12 @@ const Application: React.FC<ApplicationProps> = ({ setQuoteValue }) => {
                         localStorage.setItem('vehiclesData', JSON.stringify(newVehiclesData));
                         setVehiclesData(newVehiclesData);
 
+                        additionalMembers.forEach((addMember: AdditionalMember, index: number) => {
+                            if (additionalMembers[index].dateOfBirth)
+                                additionalMembers[index].dateOfBirth = formatDateToYYYYMMDD(
+                                    addMember.dateOfBirth
+                                );
+                        });
                         const newAdditionalMembersData = additionalMembers || [];
                         localStorage.setItem(
                             'additionalMembersData',
@@ -144,7 +137,7 @@ const Application: React.FC<ApplicationProps> = ({ setQuoteValue }) => {
         const updatedMembers = [...additionalMembersData];
         updatedMembers[index] = updatedMember;
         setAdditionalMembersData(updatedMembers);
-        localStorage.setItem('additionalMembersData', JSON.stringify(additionalMembersData));
+        localStorage.setItem('additionalMembersData', JSON.stringify(updatedMembers));
     };
 
     const addMember = () => {
@@ -152,21 +145,35 @@ const Application: React.FC<ApplicationProps> = ({ setQuoteValue }) => {
             ...additionalMembersData,
             { firstName: '', lastName: '', dateOfBirth: '', relationship: '' },
         ]);
+        localStorage.setItem('additionalMembersData', JSON.stringify(additionalMembersData));
     };
 
     const removeMember = (index: number) => {
         const updatedMembers = additionalMembersData.filter((_, i) => i !== index);
         setAdditionalMembersData(updatedMembers);
+
+        const updatedErrors = [...errors.additionalMember];
+        updatedErrors.splice(index, 1); // Remove the error at the same index
+        setErrors({ ...errors, additionalMember: updatedErrors });
+
+        localStorage.setItem('additionalMembersData', JSON.stringify(updatedMembers || []));
     };
 
     const addVehicle = () => {
         const newVehicle: Vehicle = { vin: '', year: null, make: '', model: '' };
         setVehiclesData([...vehiclesData, newVehicle]);
+        localStorage.setItem('vehiclesData', JSON.stringify(vehiclesData));
     };
 
     const removeVehicle = (index: number) => {
         const updatedVehicles = vehiclesData.filter((_, i) => i !== index);
         setVehiclesData(updatedVehicles);
+
+        const updatedVehicleErrors = [...errors.vehicle];
+        updatedVehicleErrors.splice(index, 1); // Remove the error at the same index
+        setErrors({ ...errors, vehicle: updatedVehicleErrors });
+
+        localStorage.setItem('vehiclesData', JSON.stringify(updatedVehicles || []));
     };
 
     const handleVehicleChange = (vehicleIndex: number, updatedVehicle: Vehicle) => {
@@ -198,15 +205,13 @@ const Application: React.FC<ApplicationProps> = ({ setQuoteValue }) => {
 
         if (allValid) {
             try {
-                const response = await axios.post(
-                    `http://localhost:5000/applications/${id}/submit`,
-                    {
-                        userData,
-                        addressData,
-                        vehiclesData,
-                        additionalMembersData,
-                    }
-                );
+                const response = await validateAndSubmitApplication({
+                    id,
+                    userData,
+                    addressData,
+                    vehiclesData,
+                    additionalMembersData,
+                });
 
                 // Handle success (e.g., navigating to a new page)
                 setQuoteValue(Number(response.data.validationNumber));
@@ -246,12 +251,14 @@ const Application: React.FC<ApplicationProps> = ({ setQuoteValue }) => {
             validations.additionalMembers.every((validation) => validation.isValid);
         if (allValid) {
             try {
-                await axios.put(`http://localhost:5000/applications/${id}`, {
+                await putApplication({
+                    id,
                     userData,
                     addressData,
                     vehiclesData,
                     additionalMembersData,
                 });
+                setErrors(initialErrorsState);
             } catch (error) {
                 console.error('Error saving application:', error);
             }
@@ -266,51 +273,72 @@ const Application: React.FC<ApplicationProps> = ({ setQuoteValue }) => {
     };
 
     return (
-        <div>
-            <Header>
-                <h3>Enter your Information</h3>
-            </Header>
-            <UserForm errors={errors.user} userData={userData} onChange={handleUserDataChange} />
-            <Header>
-                <h3>Additional Members</h3>
-            </Header>
-            {additionalMembersData.map((additionalMember, index) => (
-                <AdditionalMemberForm
-                    key={index}
-                    errors={errors.additionalMember[index] || {}}
-                    index={index}
-                    member={additionalMember}
-                    onChange={handleMemberChange}
-                    removeMember={removeMember}
+        <div className="container">
+            <div className="form-section">
+                <Header>
+                    <h3 className="header">Enter your Information</h3>
+                </Header>
+                <UserForm
+                    errors={errors.user}
+                    userData={userData}
+                    onChange={handleUserDataChange}
                 />
-            ))}
-            <button onClick={addMember}>Add Additional Member</button>
-
-            <Header>
-                <h3>Address</h3>
-            </Header>
-            <AddressForm
-                errors={errors.address}
-                addressData={addressData}
-                onChange={handleAddressDataChange}
-            />
-            <Header>
-                <h3>Add/Remove Vehicles</h3>
-            </Header>
-            {showVehicleMessage && <p className="error">{showVehicleMessage}</p>}
-            {vehiclesData.map((vehicle, index) => (
-                <VehiclesForm
-                    key={index}
-                    errors={errors.vehicle[index] || {}}
-                    index={index}
-                    vehicle={vehicle}
-                    onChange={handleVehicleChange}
-                    removeVehicle={removeVehicle}
+            </div>
+            <div className="members-section">
+                <Header>
+                    <h3 className="header">Additional Members</h3>
+                </Header>
+                {additionalMembersData.map((additionalMember, index) => (
+                    <AdditionalMemberForm
+                        key={index}
+                        errors={errors.additionalMember[index] || {}}
+                        index={index}
+                        member={additionalMember}
+                        onChange={handleMemberChange}
+                        removeMember={removeMember}
+                    />
+                ))}
+                <button onClick={addMember} className="add-button">
+                    Add Additional Member
+                </button>
+            </div>
+            <div className="form-section">
+                <Header>
+                    <h3 className="header">Address</h3>
+                </Header>
+                <AddressForm
+                    errors={errors.address}
+                    addressData={addressData}
+                    onChange={handleAddressDataChange}
                 />
-            ))}
-            <button onClick={addVehicle}>Add Vehicle</button>
-            <button onClick={handleSave}>Save</button>
-            <button onClick={handleSubmit}>Submit</button>
+            </div>
+            <div className="vehicles-section">
+                <Header>
+                    <h3 className="header">Add/Remove Vehicles</h3>
+                </Header>
+                {showVehicleMessage && <p className="error">{showVehicleMessage}</p>}
+                {vehiclesData.map((vehicle, index) => (
+                    <VehiclesForm
+                        key={index}
+                        errors={errors.vehicle[index] || {}}
+                        index={index}
+                        vehicle={vehicle}
+                        onChange={handleVehicleChange}
+                        removeVehicle={removeVehicle}
+                    />
+                ))}
+                <button onClick={addVehicle} className="add-button">
+                    Add Vehicle
+                </button>
+            </div>
+            <div className="form-buttons">
+                <button onClick={handleSave} className="save-button">
+                    Save
+                </button>
+                <button onClick={handleSubmit} className="submit-button">
+                    Submit
+                </button>
+            </div>
         </div>
     );
 };

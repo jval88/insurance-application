@@ -16,7 +16,7 @@ const VehiclesForm = ({ vehicle, onChange, index, removeVehicle, errors }: Vehic
                     type="text"
                     id="vin"
                     name="vin"
-                    value={vehicle.vin}
+                    value={vehicle.vin || ''}
                     onChange={handleChange}
                 />
                 {errors.vin && <p className="error">{errors.vin}</p>}
@@ -38,7 +38,7 @@ const VehiclesForm = ({ vehicle, onChange, index, removeVehicle, errors }: Vehic
                     type="text"
                     id="make"
                     name="make"
-                    value={vehicle.make}
+                    value={vehicle.make || ''}
                     onChange={handleChange}
                 />
                 {errors.make && <p className="error">{errors.make}</p>}
@@ -49,7 +49,7 @@ const VehiclesForm = ({ vehicle, onChange, index, removeVehicle, errors }: Vehic
                     type="text"
                     id="model"
                     name="model"
-                    value={vehicle.model}
+                    value={vehicle.model || ''}
                     onChange={handleChange}
                 />
                 {errors.model && <p className="error">{errors.model}</p>}
